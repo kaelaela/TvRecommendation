@@ -41,6 +41,12 @@
     <activity android:name=".DetailsActivity"/>
     <activity android:name=".PlaybackActivity"/>
     <activity android:name=".BrowseErrorActivity"/>
+
+    <receiver android:name=".recommendation.RecommendationBroadcastReceiver">
+      <intent-filter>
+        <action android:name="android.media.tv.action.INITIALIZE_PROGRAMS"/>
+      </intent-filter>
+    </receiver>
   </application>
 
 </manifest>
