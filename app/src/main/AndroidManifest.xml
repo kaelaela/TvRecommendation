@@ -37,6 +37,18 @@
 
         <category android:name="android.intent.category.LEANBACK_LAUNCHER"/>
       </intent-filter>
+      <intent-filter>
+        <action android:name="android.intent.action.VIEW"/>
+
+        <category android:name="android.intent.category.DEFAULT"/>
+        <category android:name="android.intent.category.BROWSABLE"/>
+
+        <data
+          android:host="*"
+          android:scheme="${scheme}"
+          />
+
+      </intent-filter>
     </activity>
     <activity android:name=".DetailsActivity"/>
     <activity android:name=".PlaybackActivity"/>
@@ -47,6 +59,19 @@
         <action android:name="android.media.tv.action.INITIALIZE_PROGRAMS"/>
       </intent-filter>
     </receiver>
+
+    <receiver android:name=".recommendation.ProgramRemovedReceiver">
+      <intent-filter>
+        <action android:name="android.media.tv.action.PREVIEW_PROGRAM_BROWSABLE_DISABLED"/>
+      </intent-filter>
+    </receiver>
+
+    <service
+      android:name=".recommendation.DefaultChannelRecommendationJobService"
+      android:exported="false"
+      android:permission="android.permission.BIND_JOB_SERVICE"
+      />
+
   </application>
 
 </manifest>

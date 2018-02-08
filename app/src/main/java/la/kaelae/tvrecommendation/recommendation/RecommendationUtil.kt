@@ -1,23 +1,68 @@
 package la.kaelae.tvrecommendation.recommendation
 
 import android.content.ContentResolver
+import android.content.ContentUris
+import android.net.Uri
 import android.support.media.tv.Channel
 import android.support.media.tv.PreviewProgram
 import android.support.media.tv.TvContractCompat
 import android.support.media.tv.WatchNextProgram
+import la.kaelae.tvrecommendation.BuildConfig
+import la.kaelae.tvrecommendation.Movie
 
-fun loadChannel(cr: ContentResolver,
+const val RECOMMENDATION_AUTHORITY = BuildConfig.AUTHORITY + ".recommendation"
+const val PROGRAM_QUERY = "id"
+
+fun createChannel(displayName: String): Channel {
+  val appUri = Uri.Builder()
+      .scheme(BuildConfig.APP_SCHEME)
+      .authority(RECOMMENDATION_AUTHORITY)
+      .build()
+  return Channel.Builder()
+      .setType(TvContractCompat.Channels.TYPE_PREVIEW)
+      .setDisplayName(displayName)
+      .setAppLinkIntentUri(appUri)
+      .build()
+}
+
+fun createPrograms(channelId: Long, contents: List<Movie>): List<PreviewProgram> {
+  return contents.map {
+    val uri = Uri.Builder()
+        .scheme(BuildConfig.APP_SCHEME)
+        .authority(BuildConfig.AUTHORITY)
+        .appendQueryParameter(PROGRAM_QUERY, it.id.toString())
+        .build()
+    PreviewProgram.Builder().setChannelId(channelId)
+        .setType(TvContractCompat.PreviewPrograms.TYPE_CHANNEL)
+        .setTitle(it.title)
+        .setDescription(it.description)
+        .setPosterArtUri(Uri.parse(it.cardImageUrl))
+        .setPreviewVideoUri(Uri.parse(it.videoUrl))
+        .setIntentUri(uri)
+        .setInternalProviderId(it.title.toString())
+        .build()
+  }.toList()
+}
+
+fun loadChannels(cr: ContentResolver,
     projection: Array<String>? = arrayOf(),
     selection: String? = "",
     selectionArgs: Array<String>? = arrayOf(),
-    sortOrder: String? = ""): Channel {
+    sortOrder: String? = ""): List<Channel> {
   val cursor = cr.query(TvContractCompat.Channels.CONTENT_URI, projection, selection, selectionArgs,
       sortOrder)
-  return Channel.fromCursor(cursor)
+  if (cursor == null || cursor.count == 0) return emptyList()
+  val channels = arrayListOf<Channel>()
+  cursor.moveToFirst()
+  do {
+    channels.add(Channel.fromCursor(cursor))
+  } while (cursor.moveToNext())
+  return channels
 }
 
-fun insertChannel(cr: ContentResolver, channel: Channel) {
-  cr.insert(TvContractCompat.Channels.CONTENT_URI, channel.toContentValues())
+fun insertChannel(cr: ContentResolver, channel: Channel): Long {
+  val uri = cr.insert(TvContractCompat.Channels.CONTENT_URI, channel.toContentValues())
+  return ContentUris.parseId(uri)
 }
 
 fun bulkInsertChannels(cr: ContentResolver, channels: List<Channel>) {
@@ -46,7 +91,7 @@ fun loadPrograms(cr: ContentResolver,
       projection, selection, selectionArgs, sortOrder)
   cursor ?: return emptyList()
   cursor.moveToFirst()
-  val programs = ArrayList<PreviewProgram>()
+  val programs = arrayListOf<PreviewProgram>()
   do {
     val program = PreviewProgram.fromCursor(cursor)
     if (program.channelId != channelId) continue

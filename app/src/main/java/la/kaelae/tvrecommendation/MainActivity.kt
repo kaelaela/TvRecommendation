@@ -15,7 +15,11 @@
 package la.kaelae.tvrecommendation
 
 import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
+import android.util.Log
+import la.kaelae.tvrecommendation.recommendation.DefaultChannelRecommendationJobService
+import la.kaelae.tvrecommendation.recommendation.PROGRAM_QUERY
 
 /**
  * Loads [MainFragment].
@@ -25,5 +29,19 @@ class MainActivity : Activity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     setContentView(R.layout.activity_main)
+    DefaultChannelRecommendationJobService.startJob(this)
+    if (intent != null && intent.data != null) {
+      showMovie()
+    }
+  }
+
+  private fun showMovie() {
+    Log.d("MainActivity", "url:${intent.data.toString()}")
+    val id: String? = intent.data.getQueryParameter(PROGRAM_QUERY)
+    id ?: return
+    val movie = MovieList.list.find { it.id == id.toLong() }
+    val intent = Intent(this, PlaybackActivity::class.java)
+    intent.putExtra(DetailsActivity.MOVIE, movie)
+    startActivity(intent)
   }
 }

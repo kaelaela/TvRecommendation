@@ -5,9 +5,9 @@ import android.content.Context
 import android.content.Intent
 import android.support.media.tv.TvContractCompat
 
-class RecommendationBroadcastReceiver: BroadcastReceiver() {
+class RecommendationBroadcastReceiver : BroadcastReceiver() {
   override fun onReceive(context: Context, intent: Intent) {
     if (intent.action != TvContractCompat.ACTION_INITIALIZE_PROGRAMS) return
-    //TODO start job
+    DefaultChannelRecommendationJobService.startJob(context)
   }
 }

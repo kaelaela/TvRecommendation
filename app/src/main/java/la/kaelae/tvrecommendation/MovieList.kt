@@ -67,25 +67,27 @@ object MovieList {
         "http://commondatastorage.googleapis.com/android-tv/Sample%20videos/April%20Fool's%202013/Introducing%20Google%20Fiber%20to%20the%20Pole/card.jpg",
         "http://commondatastorage.googleapis.com/android-tv/Sample%20videos/April%20Fool's%202013/Introducing%20Google%20Nose/card.jpg")
 
-    val list = arrayListOf<Movie>()
-    for (index in title.indices) {
-      list.add(
-          buildMovieInfo(
-              "category",
-              title[index],
-              description,
-              studio[index],
-              videoUrl[index],
-              cardImageUrl[index],
-              bgImageUrl[index]))
+    return title.indices.map {
+      buildMovieInfo(
+          "category",
+          title[it],
+          description,
+          studio[it],
+          videoUrl[it],
+          cardImageUrl[it],
+          bgImageUrl[it])
     }
-
-    return list
   }
 
-  private fun buildMovieInfo(category: String, title: String,
-      description: String, studio: String, videoUrl: String, cardImageUrl: String,
-      backgroundImageUrl: String): Movie {
+  private fun buildMovieInfo(
+      category: String,
+      title: String,
+      description: String,
+      studio: String,
+      videoUrl: String,
+      cardImageUrl: String,
+      backgroundImageUrl: String
+  ): Movie {
     val movie = Movie()
     movie.id = count++
     movie.title = title

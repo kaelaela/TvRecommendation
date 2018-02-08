@@ -14,9 +14,15 @@ android {
         targetSdkVersion SDK_VERSION
         versionCode VERSION_CODE as int
         versionName VERSION_NAME
+        buildConfigField("String", "APP_SCHEME", "\"${APP_SCHEME}\"")
+        buildConfigField("String", "AUTHORITY", "\"${AUTHORITY}\"")
     }
     buildTypes {
+        debug {
+            manifestPlaceholders = [domain: 'la.kaelae.tvrecommendation.dev', scheme: "${APP_SCHEME}"]
+        }
         release {
+            manifestPlaceholders = [domain: 'la.kaelae.tvrecommendation', scheme: "${APP_SCHEME}"]
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
